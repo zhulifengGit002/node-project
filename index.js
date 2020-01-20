@@ -22,6 +22,7 @@ app.use(cors())
 //     next();
 // });
 //用户注册
+
 app.post('/register', urlencodedParser, function (req, res) {
   var userName = req.body.userName;
   var pwd = req.body.pwd;
