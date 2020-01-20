@@ -5,8 +5,8 @@ const url = "mongodb+srv://text:db123456789@cluster0-vsvcn.mongodb.net/test?retr
 function searchUser(whereStr, callBack) {
     mongoClient.connect(url, { useNewUrlParser: true,useUnifiedTopology:true}, function (err, db) {
         if (err) throw err;
-        var dbo = db.db('node_runoob');
-        dbo.collection('site').find(whereStr).toArray(function (err, result) {
+        var dbo = db.db('nodeData');
+        dbo.collection('user').find(whereStr).toArray(function (err, result) {
             if (err) throw err;
             console.log('所查询的数据', result);
             callBack(result);
@@ -18,9 +18,9 @@ function searchUser(whereStr, callBack) {
 function insertUser(myobj, callBack) {
     mongoClient.connect(url, { useNewUrlParser: true,useUnifiedTopology:true}, function (err, db) {
         if (err) throw err;
-        var dbo = db.db('node_runoob');
+        var dbo = db.db('nodeData');
         //插入数据
-        dbo.collection('site').insertOne(myobj, function (err, res) {
+        dbo.collection('user').insertOne(myobj, function (err, res) {
             if (err) throw err;
             console.log('插入数据成功');
             callBack(res);
@@ -32,8 +32,8 @@ function insertUser(myobj, callBack) {
 function searchBlogPost(whereStr, callBack) {
     mongoClient.connect(url, { useNewUrlParser: true,useUnifiedTopology:true}, function (err, db) {
         if (err) throw err;
-        var dbo = db.db('node_blogPost');
-        dbo.collection('site').find(whereStr).toArray(function (err, result) {
+        var dbo = db.db('nodeData');
+        dbo.collection('post_blog').find(whereStr).toArray(function (err, result) {
             if (err) throw err;
             console.log('所查询的数据', result);
             callBack(result);
@@ -45,12 +45,26 @@ function searchBlogPost(whereStr, callBack) {
 function insertBlogPost(myobj, callBack) {
     mongoClient.connect(url, { useNewUrlParser: true,useUnifiedTopology:true}, function (err, db) {
         if (err) throw err;
-        var dbo = db.db('node_blogPost');
+        var dbo = db.db('nodeData');
         //插入数据
-        dbo.collection('site').insertOne(myobj, function (err, res) {
+        dbo.collection('post_blog').insertOne(myobj, function (err, res) {
             if (err) throw err;
-            console.log('插入章数据成功');
+            console.log('插入文章数据成功');
             callBack(res);
+            db.close();
+        })
+    })
+}
+
+//删除文章remove() 方法已经过时了，现在官方推荐使用 deleteOne() 和 deleteMany() 方法。
+function deleteBlogPost(whereStr, callBack) {
+    mongoClient.connect(url, { useNewUrlParser: true,useUnifiedTopology:true}, function (err, db) {
+        if (err) throw err;
+        var dbo = db.db('nodeData');
+        dbo.collection('post_blog').deleteOne(whereStr, function(err, result){
+            if (err) throw err;
+            console.log('删除文章数据成功', result);
+            callBack(result);
             db.close();
         })
     })
@@ -60,3 +74,4 @@ exports.searchUser = searchUser;
 exports.insertUser = insertUser;
 exports.searchBlogPost = searchBlogPost;
 exports.insertBlogPost = insertBlogPost;
+exports.deleteBlogPost = deleteBlogPost;
