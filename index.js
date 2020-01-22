@@ -6,7 +6,7 @@ const path = require('path')
 const fs = require("fs");
 const db = require('./db/db');
 const app = express();
-
+const ObjectID = require('mongodb').ObjectID;
 //创建application/x-www-form-urlencoded编码解析
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 app.use(cors())
@@ -21,8 +21,8 @@ app.use(cors())
 //     res.header("Content-Type", "application/json;charset=utf-8");
 //     next();
 // });
-//用户注册
 
+//用户注册
 app.post('/register', urlencodedParser, function (req, res) {
   var userName = req.body.userName;
   var pwd = req.body.pwd;
@@ -99,7 +99,19 @@ app.post('/blog/addPost', urlencodedParser, function(req, res){
 
 //查询博客文章
 app.post('/blog/searchPost', urlencodedParser, function (req, res) {
-    db.searchBlogPost({}, function (result) {
+    var title = req.body.title||'';
+    var postId = req.body.postId||'';
+    var pageSize = req.body.pageSize||'';
+    console.log(pageSize)
+    if(parseInt(pageSize) === 0){
+        var dbData = {}
+    }else{
+        var dbData = {
+            _id: ObjectID(postId)
+        }
+    }
+    console.log(dbData)
+    db.searchBlogPost(dbData, function (result) {
         if (result.length > 0) {
             res.json({ code: 0, message: result });
         } else {
@@ -111,10 +123,15 @@ app.post('/blog/searchPost', urlencodedParser, function (req, res) {
 //删除博客文章 不懂为什么使用 timestamp _id 删除失败
 app.post('/blog/deletePost', urlencodedParser, function (req, res) {
     var title = req.body.title||'';
-    if(!title){
+    var postId = req.body.postId||'';
+    console.log(ObjectID(postId))
+    var dbData = {
+        _id: ObjectID(postId)
+    }
+    if(!postId){
         res.json({ code: -1, message: '文章不能为空' });
     }else{
-        db.deleteBlogPost({ title: title}, function (result) {
+        db.deleteBlogPost(dbData, function (result) {
             console.log(result)
             if (result.deletedCount === 1) {
                 res.json({ code: 0, message: '删除文档' });
